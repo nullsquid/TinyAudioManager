@@ -4,7 +4,7 @@ using System.Collections.Generic;
 //must be attached to a gameobject with an audioclip
 public class TinyAudioManager : MonoBehaviour
 {
-
+    public static TinyAudioManager instance;
     public Dictionary<string, AudioClip> sounds;
     public Dictionary<string, AudioClip> backgrounds;
     AudioSource[] audiosources;
@@ -14,6 +14,8 @@ public class TinyAudioManager : MonoBehaviour
     //
     void Awake()
     {
+        instance = this;
+        //
         sounds = new Dictionary<string, AudioClip>();
         backgrounds = new Dictionary<string, AudioClip>();
         audiosources = gameObject.GetComponents<AudioSource>();
@@ -54,7 +56,23 @@ public class TinyAudioManager : MonoBehaviour
 
         }
     }
+    public static void CrossfadeBackground(string newClipName, float fadetime = 1.0f)
+    {
+        instance.audiosources[1].volume = 0.0f;
+        foreach (KeyValuePair<string, AudioClip> track in instance.backgrounds) {
+            if (track.Key == newClipName)
+            {
+                instance.audiosources[1].clip = track.Value;
+            }
+        }
+               
+        instance.StartCoroutine(instance.Crossfade(instance.audiosources[1], newClipName, fadetime));
 
+    }
+    IEnumerator Crossfade(AudioSource source, string clipName, float time)
+    {
+        yield return null;
+    }
     public void PlaySound(string clipName)
     {
         if (sounds.ContainsKey(clipName))
