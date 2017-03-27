@@ -40,5 +40,9 @@ public class TestingClass : MonoBehaviour {
         {
             TinyAudioManager.CrossfadeBackground("Division", 1f);
         }
+        else if (Input.GetKeyDown(KeyCode.S))
+        {
+            TinyAudioManager.CrossfadeBackground("Tech Live");
+        }
 	}
 }

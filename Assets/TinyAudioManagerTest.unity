@@ -343,6 +343,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audiosources: []
+  master: {fileID: 24300001, guid: d2524fe19510cfa469b94e25024ddb36, type: 2}
 --- !u!4 &666055808
 Transform:
   m_ObjectHideFlags: 0
