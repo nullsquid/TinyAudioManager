@@ -14,11 +14,7 @@ public class TinyAudioMenuItem : MonoBehaviour
         newTAMInstance.AddComponent<AudioSource>();
         //
         AudioSource[] sources = newTAMInstance.GetComponents<AudioSource>();
-        for(int i = 0; i < sources.Length; i++)
-        {
-            //sources[i].outputAudioMixerGroup = 
-
-        }
+        
     }
 
 }

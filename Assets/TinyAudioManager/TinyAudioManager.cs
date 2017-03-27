@@ -153,19 +153,88 @@ public class TinyAudioManager : MonoBehaviour
 
         instance.StartCoroutine(instance.ChannelPan(source, panStrength, panTime));
     }
-    
-    
-    public void PlaySound(string clipName)
+
+    public static void CenterAudio(float panTime)
     {
-        if (sounds.ContainsKey(clipName))
+        instance.StopAllCoroutines();
+
+        AudioSource source = instance.gameObject.GetComponent<AudioSource>();
+
+        instance.StartCoroutine(instance.PanToCenter(source, panTime));
+    }
+    
+    public static void ChangeVolume(float volAmount, float changeTime = 0.2f)
+    {
+
+    }
+    public static void ResetVolume(float changeTime = 0.2f)
+    {
+
+    }
+    public static void PlaySound(string clipName)
+    {
+        if(instance.GetComponents<AudioSource>().Length > 1)
         {
-            foreach (KeyValuePair<string, AudioClip> sound in sounds)
+            Destroy(instance.GetComponents<AudioSource>()[1]);
+            AudioSource newAudioSource = instance.gameObject.AddComponent<AudioSource>();
+            newAudioSource.Stop();
+            if (instance.sounds.ContainsKey(clipName))
+            {
+                foreach (KeyValuePair<string, AudioClip> clip in instance.sounds)
+                {
+                    if (clip.Key == clipName)
+                    {
+
+                        newAudioSource.clip = clip.Value;
+
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogWarning("No clip with name " + clipName + " found");
+            }
+            newAudioSource.Play();
+        }
+        if (instance.GetComponents<AudioSource>().Length == 1)
+        {
+
+            AudioSource newAudioSource = instance.gameObject.AddComponent<AudioSource>();
+            newAudioSource.Stop();
+            if (instance.sounds.ContainsKey(clipName))
+            {
+                foreach (KeyValuePair<string, AudioClip> clip in instance.sounds)
+                {
+                    if (clip.Key == clipName)
+                    {
+
+                        newAudioSource.clip = clip.Value;
+
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogWarning("No clip with name " + clipName + " found");
+            }
+            newAudioSource.Play();
+            
+        }
+        
+    }
+
+    /*
+    public static void PlaySound(string clipName)
+    {
+        if (instance.sounds.ContainsKey(clipName))
+        {
+            foreach (KeyValuePair<string, AudioClip> sound in instance.sounds)
             {
 
                 if (clipName == sound.Key)
                 {
-                    gameObject.GetComponent<AudioSource>().clip = sound.Value;
-                    gameObject.GetComponent<AudioSource>().Play();
+                    instance.gameObject.GetComponent<AudioSource>().clip = sound.Value;
+                    instance.gameObject.GetComponent<AudioSource>().Play();
                     break;
                 }
             }
@@ -175,7 +244,7 @@ public class TinyAudioManager : MonoBehaviour
             Debug.LogError("AudioClip not found");
         }
 
-    }
+    }*/
 
     IEnumerator Crossfade(AudioSource newSource, float fadeTime)
     {
@@ -211,6 +280,14 @@ public class TinyAudioManager : MonoBehaviour
 
     IEnumerator PanToCenter(AudioSource source, float panTime)
     {
-        yield return null;
+        float t = 0.0f;
+        float startPan = gameObject.GetComponent<AudioSource>().panStereo;
+        while (t < panTime)
+        {
+            source.panStereo = Mathf.Lerp(startPan, 0.0f, t / panTime);
+
+            t += Time.deltaTime;
+            yield return null;
+        }
     }
 }

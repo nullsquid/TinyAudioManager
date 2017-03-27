@@ -23,6 +23,10 @@ public class TestingClass : MonoBehaviour {
         {
             tam.ChangeBackgroundAudio("Tech Live");
         }
+        else if (Input.GetMouseButtonDown(2))
+        {
+            TinyAudioManager.PlaySound("Ass_1");
+        }
         else if (Input.GetKeyDown(KeyCode.Space))
         {
             currentTrack++;
@@ -43,6 +47,10 @@ public class TestingClass : MonoBehaviour {
         else if (Input.GetKeyDown(KeyCode.S))
         {
             TinyAudioManager.CrossfadeBackground("Tech Live");
+        }
+        else if (Input.GetKeyDown(KeyCode.C))
+        {
+            TinyAudioManager.CenterAudio(2f);
         }
 	}
 }
