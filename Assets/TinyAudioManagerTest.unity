@@ -342,6 +342,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ad977af03803474b8ec865abacd388e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  audiosources: []
 --- !u!4 &666055808
 Transform:
   m_ObjectHideFlags: 0
@@ -382,7 +383,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4df463473b2c7e441b21df1df108a988, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tam: {fileID: 666055807}
+  tracks:
+  - {fileID: 8300000, guid: 78cf5fe36c255e948965e5e85bdee196, type: 3}
+  - {fileID: 8300000, guid: e08fcdbd8f0ce63498d12b7c609efead, type: 3}
+  fadeTime: 1
 --- !u!4 &979117348
 Transform:
   m_ObjectHideFlags: 0

@@ -32,5 +32,13 @@ public class TestingClass : MonoBehaviour {
             }
             TinyAudioManager.CrossfadeBackground(tracks[currentTrack], fadeTime);
         }
+        else if (Input.GetKeyDown(KeyCode.Z))
+        {
+            TinyAudioManager.PanAudio(-.7f, 3.0f);
+        }
+        else if (Input.GetKeyDown(KeyCode.A))
+        {
+            TinyAudioManager.CrossfadeBackground("Division", 1f);
+        }
 	}
 }

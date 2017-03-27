@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Audio;
 using System.Collections;
 using System.Collections.Generic;
 //must be attached to a gameobject with an audioclip
@@ -8,6 +9,7 @@ public class TinyAudioManager : MonoBehaviour
     public Dictionary<string, AudioClip> sounds;
     public Dictionary<string, AudioClip> backgrounds;
     public AudioSource[] audiosources;
+    public AudioMixerGroup master;
     AudioClip[] rawSounds;
     AudioClip[] rawBkg;
     //GetComponents to get multiple audio sources
@@ -16,6 +18,10 @@ public class TinyAudioManager : MonoBehaviour
     {
         instance = this;
         //
+        if(instance.GetComponents<AudioSource>().Length > 0)
+        {
+            instance.GetComponent<AudioSource>().outputAudioMixerGroup = master;
+        }
         sounds = new Dictionary<string, AudioClip>();
         backgrounds = new Dictionary<string, AudioClip>();
         audiosources = gameObject.GetComponents<AudioSource>();
@@ -56,7 +62,41 @@ public class TinyAudioManager : MonoBehaviour
 
         }
     }
+    public static void CrossfadeBackground(string newTrackName, float fadeTime = 1.0f)
+    {
+        instance.StopAllCoroutines();
 
+        AudioClip newTrack = null;
+        if(instance.GetComponents<AudioSource>().Length > 1)
+        {
+            Destroy(instance.GetComponent<AudioSource>());
+        }
+
+        AudioSource newAudioSource = instance.gameObject.AddComponent<AudioSource>();
+        if(instance.master != null)
+        {
+            newAudioSource.outputAudioMixerGroup = instance.master;
+        }
+        newAudioSource.volume = 0.0f;
+        foreach(KeyValuePair<string, AudioClip> clip in instance.backgrounds)
+        {
+            if (instance.GetComponent<AudioSource>().name != newTrackName)
+            {
+                if (clip.Key == newTrackName)
+                {
+                    newTrack = clip.Value;
+                }
+            }
+            
+        }
+        if (instance.GetComponent<AudioSource>().name != newTrack.name)
+        {
+            newAudioSource.clip = newTrack;
+            newAudioSource.Play();
+        }
+
+        instance.StartCoroutine(instance.Crossfade(newAudioSource, fadeTime));
+    }
     public static void CrossfadeBackground(AudioClip newTrack, float fadeTime = 1.0f)
     {
         instance.StopAllCoroutines();
@@ -67,35 +107,32 @@ public class TinyAudioManager : MonoBehaviour
         }
 
         AudioSource newAudioSource = instance.gameObject.AddComponent<AudioSource>();
+        if (instance.master != null)
+        {
+            newAudioSource.outputAudioMixerGroup = instance.master;
+        }
 
         newAudioSource.volume = 0.0f;
         //
         //this should retrieve from the sounds/bkgs Dictionary(s) in the "real" version
         newAudioSource.clip = newTrack;
+        
 
         newAudioSource.Play();
 
         instance.StartCoroutine(instance.Crossfade(newAudioSource, fadeTime));
     }
-    
-    IEnumerator Crossfade(AudioSource newSource, float fadeTime)
+
+    public static void PanAudio(float panStrength, float panTime)
     {
-        float t = 0.0f;
-        float initVolume = gameObject.GetComponent<AudioSource>().volume;
+        instance.StopAllCoroutines();
 
-        while (t < fadeTime)
-        {
-            gameObject.GetComponent<AudioSource>().volume = Mathf.Lerp(initVolume, 0.0f, t / fadeTime);
-            newSource.volume = Mathf.Lerp(0.0f, 1.0f, t / fadeTime);
-            
-            t += Time.deltaTime;
+        AudioSource source = instance.gameObject.GetComponent<AudioSource>();
 
-            yield return null;
-        }
-        newSource.volume = 1.0f;
-        Destroy(gameObject.GetComponent<AudioSource>());
-        
+        instance.StartCoroutine(instance.ChannelPan(source, panStrength, panTime));
     }
+    
+    
     public void PlaySound(string clipName)
     {
         if (sounds.ContainsKey(clipName))
@@ -116,5 +153,42 @@ public class TinyAudioManager : MonoBehaviour
             Debug.LogError("AudioClip not found");
         }
 
+    }
+
+    IEnumerator Crossfade(AudioSource newSource, float fadeTime)
+    {
+        float t = 0.0f;
+        float initVolume = gameObject.GetComponent<AudioSource>().volume;
+
+        while (t < fadeTime)
+        {
+            gameObject.GetComponent<AudioSource>().volume = Mathf.Lerp(initVolume, 0.0f, t / fadeTime);
+            newSource.volume = Mathf.Lerp(0.0f, 1.0f, t / fadeTime);
+
+            t += Time.deltaTime;
+
+            yield return null;
+        }
+        newSource.volume = 1.0f;
+        Destroy(gameObject.GetComponent<AudioSource>());
+
+    }
+
+    IEnumerator ChannelPan(AudioSource source, float panStrength, float panTime = 1.0f)
+    {
+        float t = 0.0f;
+
+        while(t < panTime)
+        {
+            source.panStereo = Mathf.Lerp(0.0f, panStrength, t / panTime);
+
+            t += Time.deltaTime;
+            yield return null;
+        }
+    }
+
+    IEnumerator PanToCenter(AudioSource source, float panTime)
+    {
+        yield return null;
     }
 }
