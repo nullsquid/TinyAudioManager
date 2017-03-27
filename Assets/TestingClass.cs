@@ -3,6 +3,11 @@ using System.Collections;
 
 public class TestingClass : MonoBehaviour {
     TinyAudioManager tam;
+
+    public AudioClip[] tracks;
+    public float fadeTime = 1.0f;
+
+    private int currentTrack = 0;
 	// Use this for initialization
 	void Start () {
         tam = FindObjectOfType<TinyAudioManager>();
@@ -12,13 +17,20 @@ public class TestingClass : MonoBehaviour {
 	void Update () {
         if (Input.GetMouseButtonDown(0))
         {
-            tam.CrossfadeBackground("Division", tam.audiosources[0], tam.audiosources[1], 1.0f);
-            //tam.ChangeBackgroundAudio("Division");
+            tam.ChangeBackgroundAudio("Division");
         }
         else if (Input.GetMouseButton(1))
         {
-            tam.CrossfadeBackground("Tech Live", tam.audiosources[0], tam.audiosources[1], 1.0f);
-            //tam.ChangeBackgroundAudio("Tech Live");
+            tam.ChangeBackgroundAudio("Tech Live");
+        }
+        else if (Input.GetKeyDown(KeyCode.Space))
+        {
+            currentTrack++;
+            if(currentTrack >= tracks.Length)
+            {
+                currentTrack = 0;
+            }
+            TinyAudioManager.CrossfadeBackground(tracks[currentTrack], fadeTime);
         }
 	}
 }

@@ -56,50 +56,44 @@ public class TinyAudioManager : MonoBehaviour
 
         }
     }
-    public void CrossfadeBackground(string newClipName, AudioSource curSource, AudioSource targetSource, float fadetime = 1.0f)
+
+    public static void CrossfadeBackground(AudioClip newTrack, float fadeTime = 1.0f)
     {
-        StopAllCoroutines();
-        AudioClip newAudioClip = null;
-        
-        foreach (KeyValuePair<string, AudioClip> track in backgrounds) {
-            if (track.Key == newClipName)
-            {
-                //instance.audiosources[1].clip = track.Value;
-                newAudioClip = track.Value;
-            }
-        }
-        StartCoroutine(Crossfade(fadetime, curSource, targetSource));
-        /*
-        if (instance.audiosources[0].isPlaying)
-        {
-            instance.audiosources[1].clip = newAudioClip;
-            instance.audiosources[1].volume = 0.0f;
-            instance.StartCoroutine(instance.Crossfade(instance.audiosources[1], fadetime, audiosources[0], audiosources[1]));
-        }
-        else if (instance.audiosources[1].isPlaying)
-        {
-            instance.audiosources[0].clip = newAudioClip;
-            instance.audiosources[0].volume = 0.0f;
-            instance.StartCoroutine(instance.Crossfade(instance.audiosources[0], fadetime, audiosources[1], audiosources[0]));
-        }
-        */
+        instance.StopAllCoroutines();
 
-        
+        if(instance.GetComponents<AudioSource>().Length > 1)
+        {
+            Destroy(instance.GetComponent<AudioSource>());
+        }
 
+        AudioSource newAudioSource = instance.gameObject.AddComponent<AudioSource>();
+
+        newAudioSource.volume = 0.0f;
+        //
+        //this should retrieve from the sounds/bkgs Dictionary(s) in the "real" version
+        newAudioSource.clip = newTrack;
+
+        newAudioSource.Play();
+
+        instance.StartCoroutine(instance.Crossfade(newAudioSource, fadeTime));
     }
-    IEnumerator Crossfade(float fadeTime, AudioSource start, AudioSource end)
+    
+    IEnumerator Crossfade(AudioSource newSource, float fadeTime)
     {
         float t = 0.0f;
+        float initVolume = gameObject.GetComponent<AudioSource>().volume;
 
-        while(t < fadeTime)
+        while (t < fadeTime)
         {
-            end.volume = Mathf.Lerp(0.0f, 1.0f, t/fadeTime);
-            start.volume = 1.0f - start.volume;
+            gameObject.GetComponent<AudioSource>().volume = Mathf.Lerp(initVolume, 0.0f, t / fadeTime);
+            newSource.volume = Mathf.Lerp(0.0f, 1.0f, t / fadeTime);
+            
             t += Time.deltaTime;
+
             yield return null;
         }
-        end.volume = 1.0f;
-        
+        newSource.volume = 1.0f;
+        Destroy(gameObject.GetComponent<AudioSource>());
         
     }
     public void PlaySound(string clipName)
