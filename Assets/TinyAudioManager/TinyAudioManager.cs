@@ -7,7 +7,7 @@ public class TinyAudioManager : MonoBehaviour
     public static TinyAudioManager instance;
     public Dictionary<string, AudioClip> sounds;
     public Dictionary<string, AudioClip> backgrounds;
-    AudioSource[] audiosources;
+    public AudioSource[] audiosources;
     AudioClip[] rawSounds;
     AudioClip[] rawBkg;
     //GetComponents to get multiple audio sources
@@ -56,22 +56,51 @@ public class TinyAudioManager : MonoBehaviour
 
         }
     }
-    public static void CrossfadeBackground(string newClipName, float fadetime = 1.0f)
+    public void CrossfadeBackground(string newClipName, AudioSource curSource, AudioSource targetSource, float fadetime = 1.0f)
     {
-        instance.audiosources[1].volume = 0.0f;
-        foreach (KeyValuePair<string, AudioClip> track in instance.backgrounds) {
+        StopAllCoroutines();
+        AudioClip newAudioClip = null;
+        
+        foreach (KeyValuePair<string, AudioClip> track in backgrounds) {
             if (track.Key == newClipName)
             {
-                instance.audiosources[1].clip = track.Value;
+                //instance.audiosources[1].clip = track.Value;
+                newAudioClip = track.Value;
             }
         }
-               
-        instance.StartCoroutine(instance.Crossfade(instance.audiosources[1], newClipName, fadetime));
+        StartCoroutine(Crossfade(fadetime, curSource, targetSource));
+        /*
+        if (instance.audiosources[0].isPlaying)
+        {
+            instance.audiosources[1].clip = newAudioClip;
+            instance.audiosources[1].volume = 0.0f;
+            instance.StartCoroutine(instance.Crossfade(instance.audiosources[1], fadetime, audiosources[0], audiosources[1]));
+        }
+        else if (instance.audiosources[1].isPlaying)
+        {
+            instance.audiosources[0].clip = newAudioClip;
+            instance.audiosources[0].volume = 0.0f;
+            instance.StartCoroutine(instance.Crossfade(instance.audiosources[0], fadetime, audiosources[1], audiosources[0]));
+        }
+        */
+
+        
 
     }
-    IEnumerator Crossfade(AudioSource source, string clipName, float time)
+    IEnumerator Crossfade(float fadeTime, AudioSource start, AudioSource end)
     {
-        yield return null;
+        float t = 0.0f;
+
+        while(t < fadeTime)
+        {
+            end.volume = Mathf.Lerp(0.0f, 1.0f, t/fadeTime);
+            start.volume = 1.0f - start.volume;
+            t += Time.deltaTime;
+            yield return null;
+        }
+        end.volume = 1.0f;
+        
+        
     }
     public void PlaySound(string clipName)
     {

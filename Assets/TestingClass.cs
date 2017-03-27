@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class TestingClass : MonoBehaviour {
-    public TinyAudioManager tam;
+    TinyAudioManager tam;
 	// Use this for initialization
 	void Start () {
         tam = FindObjectOfType<TinyAudioManager>();
@@ -12,11 +12,13 @@ public class TestingClass : MonoBehaviour {
 	void Update () {
         if (Input.GetMouseButtonDown(0))
         {
-            tam.ChangeBackgroundAudio("Division");
+            tam.CrossfadeBackground("Division", tam.audiosources[0], tam.audiosources[1], 1.0f);
+            //tam.ChangeBackgroundAudio("Division");
         }
         else if (Input.GetMouseButton(1))
         {
-            tam.ChangeBackgroundAudio("Tech Live");
+            tam.CrossfadeBackground("Tech Live", tam.audiosources[0], tam.audiosources[1], 1.0f);
+            //tam.ChangeBackgroundAudio("Tech Live");
         }
 	}
 }
