@@ -84,7 +84,27 @@ public class TinyAudioManager : MonoBehaviour
             }
             
         }
-        if (instance.GetComponent<AudioSource>().clip.name != newTrack.name)
+        if (instance.GetComponent<AudioSource>().clip != null)
+        {
+            if (instance.GetComponent<AudioSource>().clip.name != newTrack.name)
+            {
+                AudioSource newAudioSource = instance.gameObject.AddComponent<AudioSource>();
+                if (instance.master != null)
+                {
+                    newAudioSource.outputAudioMixerGroup = instance.master;
+                }
+                newAudioSource.volume = 0.0f;
+                newAudioSource.clip = newTrack;
+                newAudioSource.Play();
+                instance.StartCoroutine(instance.Crossfade(newAudioSource, fadeTime));
+
+            }
+            else
+            {
+                return;
+            }
+        }
+        else
         {
             AudioSource newAudioSource = instance.gameObject.AddComponent<AudioSource>();
             if (instance.master != null)
@@ -95,12 +115,8 @@ public class TinyAudioManager : MonoBehaviour
             newAudioSource.clip = newTrack;
             newAudioSource.Play();
             instance.StartCoroutine(instance.Crossfade(newAudioSource, fadeTime));
-
         }
-        else
-        {
-            return;
-        }
+        
 
     }
     public static void CrossfadeBackground(AudioClip newTrack, float fadeTime = 1.0f)
